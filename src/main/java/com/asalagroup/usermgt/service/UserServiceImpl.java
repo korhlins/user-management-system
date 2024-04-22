@@ -2,11 +2,12 @@ package com.asalagroup.usermgt.service;
 
 import com.asalagroup.usermgt.commons.ResponseCodes;
 import com.asalagroup.usermgt.entities.User;
-import com.asalagroup.usermgt.payload.request.UserCreationRequest;
+import com.asalagroup.usermgt.payload.request.GetUserRequest;
+import com.asalagroup.usermgt.payload.request.UserRequest;
 import com.asalagroup.usermgt.payload.request.UserUpdateResquest;
+import com.asalagroup.usermgt.payload.response.GetUserResponse;
 import com.asalagroup.usermgt.payload.response.ServerResponse;
-import com.asalagroup.usermgt.payload.response.UserCreationResponseData;
-import com.asalagroup.usermgt.payload.response.UserUpdateResponseData;
+import com.asalagroup.usermgt.payload.response.UserResponseData;
 import com.asalagroup.usermgt.repositories.UserMgtRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,9 @@ public class UserServiceImpl implements UserService {
     private UserMgtRepository userMgtRepository;
 
     @Override
-    public ServerResponse<UserCreationResponseData> createUser(UserCreationRequest userCreationRequest) {
+    public ServerResponse<UserResponseData> createUser(UserRequest userCreationRequest) {
 
-        ServerResponse<UserCreationResponseData> serverResponse = new ServerResponse<>();
+        ServerResponse<UserResponseData> serverResponse = new ServerResponse<>();
 
         User user = userMgtRepository.findUserByEmail(userCreationRequest.getEmailAddress());
         if (user != null) {
@@ -51,7 +52,7 @@ public class UserServiceImpl implements UserService {
 
         User createdUser = userMgtRepository.createUser(user);
 
-        UserCreationResponseData userCreationResponseData = new UserCreationResponseData();
+        UserResponseData userCreationResponseData = new UserResponseData();
         userCreationResponseData.setFirstName(createdUser.getFirstName());
         userCreationResponseData.setLastName(createdUser.getLastName());
         userCreationResponseData.setEmailAddress(createdUser.getEmailAddress());
@@ -63,13 +64,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ServerResponse<UserUpdateResponseData> updateUser(UserUpdateResquest userUpdateResquest) {
+    public ServerResponse<UserResponseData> updateUser(UserUpdateResquest userUpdateResquest) {
 
-        System.out.println(userUpdateResquest.getNewFirstName());
-
-        ServerResponse<UserUpdateResponseData> serverResponse = new ServerResponse<>();
-
-        System.out.println(userUpdateResquest.getFormerEmail() + " " + userUpdateResquest.getNewFirstName() + " " + userUpdateResquest.getNewMobileNumber() + " " +userUpdateResquest.getNewMobileNumber());
+        ServerResponse<UserResponseData> serverResponse = new ServerResponse<>();
 
         User user = userMgtRepository.findUserByEmail(userUpdateResquest.getFormerEmail());
         System.out.println(user);
@@ -80,18 +77,58 @@ public class UserServiceImpl implements UserService {
         }
 
 
-
         User updatedUser = userMgtRepository.updateExistingUser(userUpdateResquest.getFormerEmail(), userUpdateResquest.getNewFirstName(), userUpdateResquest.getNewMobileNumber(), userUpdateResquest.getNewMobileNumber());
 
-        System.out.println(updatedUser);
-        UserUpdateResponseData userUpdateResponseData = new UserUpdateResponseData();
-        userUpdateResponseData.setFirstName(updatedUser.getFirstName());
-        userUpdateResponseData.setLastName(updatedUser.getLastName());
-        userUpdateResponseData.setEmailAddress(updatedUser.getEmailAddress());
+        UserResponseData userResponseData = new UserResponseData();
+        userResponseData.setFirstName(updatedUser.getFirstName());
+        userResponseData.setLastName(updatedUser.getLastName());
+        userResponseData.setEmailAddress(updatedUser.getEmailAddress());
 
         serverResponse.setResponseCode(ResponseCodes.BAD_MODEL);
         serverResponse.setResponseMessage("user updated successfully");
-        serverResponse.setResponseData(userUpdateResponseData);
+        serverResponse.setResponseData(userResponseData);
+
+        return serverResponse;
+    }
+
+    @Override
+    public ServerResponse<?> deleteAllUsers(){
+        ServerResponse<?> serverResponse = new ServerResponse<>();
+
+        userMgtRepository.deleteAllUsers();
+
+        serverResponse.setResponseMessage("Successfully deleted");
+        serverResponse.setResponseCode(ResponseCodes.SUCCESS);
+        return serverResponse;
+    }
+
+    @Override
+    public ServerResponse<GetUserResponse> getUserByEmail(GetUserRequest getUserRequest){
+
+        ServerResponse<GetUserResponse> serverResponse = new ServerResponse<>();
+
+        User user = userMgtRepository.findUserByEmail(getUserRequest.getEmail());
+        if(user == null) {
+            serverResponse.setResponseCode(ResponseCodes.BAD_MODEL);
+            serverResponse.setResponseMessage("user does not exist");
+            return serverResponse;
+        }
+
+        GetUserResponse getUserResponse = new GetUserResponse();
+        getUserResponse.setFirstName(user.getFirstName());
+        getUserResponse.setLastName(user.getLastName());
+        getUserResponse.setEmailAddress(user.getEmailAddress());
+        getUserResponse.setMiddleName(user.getMiddleName());
+        getUserResponse.setGender(user.getGender());
+        getUserResponse.setCity(user.getCity());
+        getUserResponse.setCountry(user.getCountry());
+        getUserResponse.setState(user.getState());
+        getUserResponse.setMobileNumber(user.getMobileNumber());
+        getUserResponse.setDateOfBirth(user.getDateOfBirth());
+
+        serverResponse.setResponseCode(ResponseCodes.SUCCESS);
+        serverResponse.setResponseMessage("user selected successfully");
+        serverResponse.setResponseData(getUserResponse);
 
         return serverResponse;
     }

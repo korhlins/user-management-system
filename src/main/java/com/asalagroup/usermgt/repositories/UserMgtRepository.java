@@ -11,4 +11,6 @@ public interface UserMgtRepository {
     User findUserByMobileNumber(String mobileNumber);
 
     User updateExistingUser(String formerEmail, String firstName, String mobileNumber, String email);
+
+    void deleteAllUsers();
 }

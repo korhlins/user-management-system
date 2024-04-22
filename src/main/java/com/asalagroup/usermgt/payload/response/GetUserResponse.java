@@ -1,19 +1,14 @@
-package com.asalagroup.usermgt.payload.request;
-
+package com.asalagroup.usermgt.payload.response;
 
 import com.asalagroup.usermgt.commons.Gender;
-import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.time.LocalDate;
 
 @Getter
 @Setter
-@ToString
-public class UserCreationRequest {
-
+public class GetUserResponse {
     private String firstName;
     private String lastName;
     private String middleName;
@@ -25,5 +20,4 @@ public class UserCreationRequest {
     private String state;
     private String city;
     private String residentialAddress;
-
 }

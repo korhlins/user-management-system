@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserUpdateResponseData {
+public class UserResponseData {
     private String firstName;
     private String lastName;
     private String emailAddress;

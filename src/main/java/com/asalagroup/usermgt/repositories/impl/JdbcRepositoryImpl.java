@@ -51,16 +51,24 @@ public class JdbcRepositoryImpl implements UserMgtRepository {
 
     @Override
     public User updateExistingUser(String formerEmail, String newFirstName, String newMobileNumber, String newEmail){
-        User user = findUserByEmail(formerEmail);
+
         String query = """
                  update as_user 
                  set first_name = '%s', mobile_number = '%s', email_address = '%s' 
                  where  email_address = '%s'
                  """;
-         query = String.format(query, newFirstName, newMobileNumber, newEmail, user.getEmailAddress());
+         query = String.format(query, newFirstName, newMobileNumber, newEmail, formerEmail);
          jdbcTemplate.update(query);
-         user = findUserByEmail(newEmail);
+         User user = findUserByEmail(newEmail);
         return user;
+    }
+
+    @Override
+    public void deleteAllUsers(){
+        String query = """
+                delete from as_user
+                """;
+        jdbcTemplate.execute(query);
     }
 
 
